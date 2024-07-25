@@ -1,0 +1,72 @@
+---
+import { Image } from "astro:assets";
+import type { BlogType } from "../../type";
+import { RootLayout } from "../../layouts";
+import { getEntry } from "astro:content";
+
+const { slug } = Astro.params;
+
+if (!slug) {
+  throw new Error("Slug is required");
+}
+
+const article: BlogType | undefined = await getEntry("blog", slug);
+
+if (!article) return Astro.redirect("/404");
+
+const { Content } = await article?.render();
+---
+
+<RootLayout title={article.data.title}>
+  <section class="container mx-auto max-w-screen-lg mt-10 px-8">
+    <a
+      href="/articles"
+      class="inline-block bg-gray-100 p-2 mb-6 hover:bg-indigo-500 hover:text-white"
+      >Back To Articles</a
+    >
+    <article>
+      <h1 class="text-4xl font-bold mb-2">
+        {article?.data.title}
+      </h1>
+      <h3 class="text-lg mb-2">
+        Written by {article.data.author} on {
+          article?.data.pubDate.toDateString()
+        }
+      </h3>
+      <div class="flex flex-wrap gap-2 mb-6">
+        <div class="flex flex-wrap gap-2">
+          {
+            article?.data.tags.map((tag: string, index: number) => (
+              <span
+                class={`px-2 py-1 text-white rounded-full text-xs hover:opacity-90 capitalize ${index % 2 === 0 ? "bg-blue-500" : "bg-purple-500"}`}
+              >
+                <a href={"/articles/tag/" + tag}>{tag}</a>
+              </span>
+            ))
+          }
+        </div>
+        <Image
+          width={600}
+          height={600 / 0.5}
+          src={article.data.image}
+          alt={article.data.title}
+          class="w-full object-cover hover:opacity-75 transition duration-300 ease-in-out"
+        />
+        <div class="prose prose-2xl overflow-visible relative mb-20">
+          <Content />
+        </div>
+      </div>
+    </article>
+  </section>
+</RootLayout>
+
+<style is:global>
+  p {
+    margin: 20px 0;
+  }
+
+  h2 {
+    margin: 20px 0;
+    font-size: 1.8rem;
+  }
+</style>

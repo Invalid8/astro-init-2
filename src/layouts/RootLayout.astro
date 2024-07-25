@@ -1,0 +1,36 @@
+---
+import { slide, ViewTransitions } from "astro:transitions";
+import { Navbar, Footer } from "../components";
+import { SITE_DESCRIPTION, SITE_TITLE } from "../constants";
+
+interface Props {
+  title?: string;
+  image?: string;
+  description?: string;
+}
+
+const { title, image, description } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="og:image" content={image ?? "/images/image1.jpg"} />
+    <meta name="description" content={description ?? SITE_DESCRIPTION} />
+
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.js"
+      integrity="sha512-BJ/5sR2hFxQTKin/55JQCcMTObShDBAmVjL/3NR/MVcrhyOazJjAgvROem03+HYyGw16SVdSfoWCFGr9syxAKA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"></script>
+    <title>{SITE_TITLE} {title && "- " + title}</title>
+    <ViewTransitions transition:animate={slide({ duration: 0.8 })} />
+  </head>
+  <body class="">
+    <Navbar />
+    <slot />
+    <Footer />
+  </body>
+</html>

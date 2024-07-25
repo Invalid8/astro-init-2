@@ -1,0 +1,31 @@
+---
+import { RootLayout } from "../../layouts";
+import { ArticleList, Pagination, SearchForm } from "../../components";
+
+import { getCollection } from "astro:content";
+import { type BlogType } from "../../type";
+import { ARTICLES_PER_PAGE } from "../../constants";
+
+const current: number | null = +Astro.url.searchParams.get("page")! || 1;
+
+const allBlogArticles: BlogType[] = (await getCollection("blog")).sort(
+  (a: BlogType, b: BlogType) =>
+    b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+
+const total: number = Math.ceil(allBlogArticles.length / ARTICLES_PER_PAGE);
+
+const articlesForPage: BlogType[] = allBlogArticles.slice(
+  (current - 1) * ARTICLES_PER_PAGE,
+  current * ARTICLES_PER_PAGE
+);
+---
+
+<RootLayout title="Articles | Tech People">
+  <section class="container mx-auto max-w-screen-xl mt-10 px-8">
+    <h1 class="text-2xl pb-3">All Articles</h1>
+    <SearchForm />
+    <ArticleList articles={articlesForPage} />
+    <Pagination currentPage={current} totalPage={total} />
+  </section>
+</RootLayout>

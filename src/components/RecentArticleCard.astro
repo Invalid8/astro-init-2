@@ -1,0 +1,50 @@
+---
+import { Image } from "astro:assets";
+import { FormatDate } from "../lib";
+import type { BlogType } from "../type";
+
+interface Props {
+  article: BlogType;
+}
+
+const { article } = Astro.props;
+---
+
+{
+  !!article ? (
+    <div class="relative inline-block w-full sm:w-auto cursor-pointer rounded-2xl overflow-hidden">
+      <a href={"/articles/" + article.slug}>
+        <Image
+          width={400}
+          height={400 / 0.5}
+          src={article.data.image}
+          alt={article.data.title}
+          class="w-full object-cover hover:opacity-75 transition duration-300 ease-in-out"
+        />
+
+        <div class="absolute inset-0 flex flex-col items-center justify-center bg-black opacity-80 hover:opacity-75 transition duration-300 ease-in-out text-white text-center rounded-2xl">
+          <div>
+            <h2 class="text-2xl font-semibold sm:text-3xl">
+              {article.data.title}
+            </h2>
+            <p class="text-xl mt-4">{FormatDate(article.data.pubDate)}</p>
+
+            <div class="flex mt-4 justify-center">
+              {article.data.tags.map((tag: string, index: number) => (
+                <span class="px-2 py-1 border text-white rounded-full text-xs mr-2">
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </a>
+    </div>
+  ) : (
+    <div class="relative w-full sm:w-auto cursor-pointer rounded-2xl h-52 bg-gray-300 text-center grid place-content-center">
+      <div class="info">
+        <p class="text-2xl">No recent article at the moment</p>
+      </div>
+    </div>
+  )
+}

@@ -1,16 +1,40 @@
 ---
+import { ArticleList, RecentArticleCard } from "../components";
+import { RootLayout } from "../layouts";
 
+import { getCollection } from "astro:content";
+import { type BlogType } from "../type";
+import { SearchForm } from "../components";
+import { HOMEPAGE_ARTICLE_LIMIT } from "../constants";
+
+const allBlogArticles: BlogType[] = (await getCollection("blog")).sort(
+  (a: BlogType, b: BlogType) =>
+    b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+
+const mostRecentArticle: BlogType = allBlogArticles[0];
+const otherArticles: BlogType[] = allBlogArticles.slice(
+  1,
+  HOMEPAGE_ARTICLE_LIMIT + 1
+);
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<RootLayout>
+  <section class="container mx-auto max-w-screen-xl mt-10 px-8">
+    <!-- Top Grid -->
+    <div class="grid grid-cols-1 gap-5 lg:grid-cols-2 lg:items-center">
+      <div>
+        <h1 class="text-5xl font-bold mt-4 mb-8 leading-tight xl:text-6xl">
+          Articles, Stories & Tutorials for Tech People
+        </h1>
+
+        <SearchForm />
+      </div>
+      <!-- Most Recent Article -->
+      <RecentArticleCard article={mostRecentArticle} />
+    </div>
+
+    <!-- Main Grid -->
+    <ArticleList articles={otherArticles} />
+  </section>
+</RootLayout>

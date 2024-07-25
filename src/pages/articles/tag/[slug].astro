@@ -1,0 +1,36 @@
+---
+import { getCollection } from "astro:content";
+import { RootLayout } from "../../../layouts";
+import { ArticleCard } from "../../../components";
+import type { BlogType } from "../../../type";
+
+const { slug } = Astro.params;
+
+if (!slug) {
+  throw new Error("Slug is required");
+}
+
+const filteredBlogArticles: BlogType[] = (await getCollection("blog")).filter(
+  (e) => e.data.tags.includes(slug)
+);
+
+const sortedArticles: BlogType[] = filteredBlogArticles.sort(
+  (a: BlogType, b: BlogType) =>
+    b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+---
+
+<RootLayout title={`#${slug}`}>
+  <section class="container mx-auto max-w-screen-xl mt-10 px-8">
+    <a
+      href="/articles"
+      class="inline-block bg-gray-100 p-2 mb-6 hover:bg-indigo-500 hover:text-white"
+      >Back To Articles</a
+    >
+    <h1 class="text-2xl pb-3 capitalize">#{slug}</h1>
+    <!-- Main Grid -->
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {sortedArticles.map((article) => <ArticleCard article={article} />)}
+    </div>
+  </section>
+</RootLayout>

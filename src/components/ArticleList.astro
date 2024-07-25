@@ -1,0 +1,14 @@
+---
+import { ArticleCard } from "../components";
+import type { BlogType } from "../type";
+
+interface Props {
+  articles: BlogType[];
+}
+
+const { articles } = Astro.props;
+---
+
+<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+  {articles.map((article) => <ArticleCard article={article} />)}
+</div>

@@ -1,0 +1,52 @@
+---
+import { getCollection } from "astro:content";
+import { RootLayout } from "../../layouts";
+import type { BlogType } from "../../type";
+import { ArticleList, SearchForm } from "../../components";
+
+const query: string | null = Astro.url.searchParams.get("query");
+
+const searchedBlogArticles: BlogType[] = (await getCollection("blog")).filter(
+  (e) => {
+    const titleMatch: boolean = e.data.title
+      .toLowerCase()
+      .includes(query!.toLowerCase());
+    const bodyMatch: boolean = e.body
+      .toLowerCase()
+      .includes(query!.toLowerCase());
+
+    const slugMatch: boolean = e.slug
+      .toLowerCase()
+      .includes(query!.toLowerCase());
+    const tagMatch: boolean = e.data.tags.includes(query!.toLowerCase());
+
+    return titleMatch || bodyMatch || slugMatch || tagMatch;
+  }
+);
+
+const sortedArticles: BlogType[] = searchedBlogArticles.sort(
+  (a: BlogType, b: BlogType) =>
+    b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+---
+
+<RootLayout title={`Search Results: "${query}"`}>
+  <section class="container mx-auto max-w-screen-xl mt-10 px-8">
+    <a
+      href="/articles"
+      class="inline-block bg-gray-100 p-2 mb-5 hover:bg-indigo-500"
+    >
+      All Articles</a
+    >
+    <SearchForm value={query || ""} />
+    <h1 class="text-2xl pb-1 mt-6">Result for <strong>{query}</strong></h1>
+    <ArticleList articles={sortedArticles} />
+    <div class="noresult w-full min-h-20 h-full grid place-content-center">
+      <div class="info">
+        <p class="text-2xl center">
+          Articles with such keyword does not exist.
+        </p>
+      </div>
+    </div>
+  </section>
+</RootLayout>
